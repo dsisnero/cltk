@@ -18,7 +18,7 @@ module CLTK
       # @param [Match]	match		Match object for matching text.
 
       @state : Array(Symbol)
-      @match : Regex::MatchData?
+      @match : Regex::MatchData | StringScanner::StringMatchData | Nil
 
       def match
         @match.as(Regex::MatchData)

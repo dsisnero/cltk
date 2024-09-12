@@ -495,7 +495,7 @@ module CLTK
         build_up_productions
         unless ENV["NOCACHE"]?
           if (path = opts[:use]).is_a?(String)
-            if File.exists?(path) && File.readable?(path)
+            if File.exists?(path) && File::Info.readable?(path)
               finalize_from_serialized_parser(path)
               return
             end

@@ -6,14 +6,13 @@ require "../xparser"
 lexer = EXP_LANG::Lexer
 parser = EXP_LANG::Parser
 
-it "EXP_LANG::Parser::Comments" do
+describe "EXP_LANG::Parser::Comments" do
+  it "parses a program ignoring commented lines" do
+    string = "1 + 2 # simple addition \n" \
+             "# one long comment spanning \n" \
+             "# several lines \n"
+    tokens = lexer.lex(string)
 
-  string = "1 + 2 # simple addition \n" \
-           "# one long comment spanning \n" \
-           "# several lines \n"
-  tokens = lexer.lex(string)
-
-  it "parses a programm ignoring commented lines" do
     res = parser.parse(tokens, {accept: :first}).as(XProgram).expressions.as(Array).first
     res.class.should eq Add
     rright = res.as(Add).right.as(ANumber)
@@ -21,7 +20,6 @@ it "EXP_LANG::Parser::Comments" do
     rleft.value.should eq 1.to_f
     rright.value.should eq 2.to_f
   end
-
 end
 
 describe "EXP_LANG::Parser::VariableAssignment" do

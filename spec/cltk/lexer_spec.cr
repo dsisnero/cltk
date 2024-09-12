@@ -61,7 +61,11 @@ end
 
 class MatchDataLexer < CLTK::Lexer
   rule(/a(b*)(c+)/) do |txt|
-    {:FOO, [match[1]?, match[2]?].join(", ") }
+    if match
+      {:FOO, [match[1]?, match[2]?].join(", ") }
+    else
+      {:FOO, ""}
+    end
   end
 end
 

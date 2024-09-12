@@ -29,7 +29,7 @@ module CLTK
 
     macro inherited
       class Environment < CLTK::Lexer::Environment
-        property match : Regex::MatchData | Nil
+        property match : Regex::MatchData | StringScanner::StringMatchData | Nil
       end
       alias ProcType = Proc(String, {{@type}}::Environment, BlockReturn?)
       alias FlagsType = Array(Symbol)

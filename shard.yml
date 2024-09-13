@@ -7,7 +7,7 @@ authors:
 
 dependencies:
   crystal-dfa:
-    github: ziprandom/crystal-dfa
+    github: dsisnero/crystal-dfa
     branch: master
   msgpack:
     github: crystal-community/msgpack-crystal

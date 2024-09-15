@@ -27,19 +27,20 @@ describe "EXP_LANG::Scope" do
     end
 
     describe "#clone" do
-      scope = EXP_LANG::Scope(String).new
-      scope["name"] = "first"
-      scope["age"] = "twelve"
+      original_scope = EXP_LANG::Scope(String).new
+      original_scope["name"] = "first"
+      original_scope["age"] = "twelve"
 
       it "can clone itself" do
-        scope.clone.should_not eq scope
+        cloned_scope = original_scope.clone
+        cloned_scope.should_not eq original_scope
       end
 
       it "will clone all the values" do
-        scope.clone["name"].should eq "first"
-        scope.clone["age"].should eq "twelve"
+        cloned_scope = original_scope.clone
+        cloned_scope["name"].should eq "first"
+        cloned_scope["age"].should eq "twelve"
       end
-
     end
   end
   context "recursive lookups" do

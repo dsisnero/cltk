@@ -28,7 +28,9 @@ module CLTK
     {% end %}
 
     macro inherited
-      class Environment < CLTK::Lexer::Environment; end
+      class Environment < CLTK::Lexer::Environment
+        property match : Regex::MatchData | StringScanner::StringMatchData | Nil
+      end
       alias ProcType = Proc(String, {{@type}}::Environment, BlockReturn?)
       alias FlagsType = Array(Symbol)
       alias RuleType = Tuple(FlagsType, ProcType)

@@ -1,9 +1,7 @@
 require "../spec_helper"
 
 class ENVLexer < CLTK::Lexer
-
   class Environment < CLTK::Lexer::Environment
-
     def initialize(*args)
       @value = -1
       super(*args)
@@ -13,17 +11,16 @@ class ENVLexer < CLTK::Lexer
       @value += 1
       @value.as(Int32)
     end
-
   end
 
   rule(/a/) do |txt|
-    next {:A, next_value }
+    next {:A, next_value}
   end
 end
 
 class ABLongest < CLTK::Lexer
-  rule(/a+/)   { :APLUS }
-  rule(/b+/)   { :BPLUS }
+  rule(/a+/) { :APLUS }
+  rule(/b+/) { :BPLUS }
 
   rule(/a+b+/) { :APLUSBPLUS }
 end
@@ -31,23 +28,22 @@ end
 class ABFirst < CLTK::Lexer
   match_first
 
-  rule(/a+/)   { :APLUS }
-  rule(/b+/)   { :BPLUS }
+  rule(/a+/) { :APLUS }
+  rule(/b+/) { :BPLUS }
 
   rule(/a+b+/) { :APLUSBPLUS }
 end
 
-
 class FlagLexer < CLTK::Lexer
-  rule(/a/)	 { |txt| set_flag(:a); :A }
+  rule(/a/) { |txt| set_flag(:a); :A }
   rule(/\s/)
 
-  rule(/b/, :default, [:a])     { |txt| set_flag(:b); :B }
+  rule(/b/, :default, [:a]) { |txt| set_flag(:b); :B }
   rule(/c/, :default, [:a, :b]) { :C }
 end
 
 class StateLexer < CLTK::Lexer
-  rule(/a/)    { :A }
+  rule(/a/) { :A }
   rule(/\s/)
 
   rule(/\(\*/) { |txt|
@@ -56,17 +52,20 @@ class StateLexer < CLTK::Lexer
 
   rule(/\(\*/, :comment) { |txt| push_state(:comment) }
   rule(/\*\)/, :comment) { |txt| pop_state }
-  rule(/./,    :comment)
+  rule(/./, :comment)
 end
 
 class MatchDataLexer < CLTK::Lexer
   rule(/a(b*)(c+)/) do |txt|
-    {:FOO, [match[1]?, match[2]?].join(", ") }
+    if matched = match
+      {:FOO, [matched[1]?, matched[2]?].join(", ")}
+    else
+      {:FOO, ""}
+    end
   end
 end
 
 describe "CLTK::Lexer" do
-
   describe "test_calc" do
     expected = [
       CLTK::Token.new(:NUM, 1),
@@ -78,7 +77,7 @@ describe "CLTK::Lexer" do
 
       CLTK::Token.new(:LPAREN),
       CLTK::Token.new(:RPAREN),
-      CLTK::Token.new(:EOS)
+      CLTK::Token.new(:EOS),
     ]
     actual = CLTK::Lexers::Calculator.lex("1 + - * / ( )")
     expected.should eq actual
@@ -92,7 +91,7 @@ describe "CLTK::Lexer" do
       CLTK::Token.new(:STAR),
       CLTK::Token.new(:PLUS),
       CLTK::Token.new(:QUESTION),
-      CLTK::Token.new(:EOS)
+      CLTK::Token.new(:EOS),
     ]
     actual = CLTK::Lexers::EBNF.lex("aaa BBB * + ?")
     actual.should eq expected
@@ -103,7 +102,7 @@ describe "CLTK::Lexer" do
       CLTK::Token.new(:A, 0),
       CLTK::Token.new(:A, 1),
       CLTK::Token.new(:A, 2),
-      CLTK::Token.new(:EOS)
+      CLTK::Token.new(:EOS),
     ]
 
     actual = ENVLexer.lex("aaa")
@@ -117,18 +116,17 @@ describe "CLTK::Lexer" do
       CLTK::Token.new(:A, 3),
       CLTK::Token.new(:A, 4),
       CLTK::Token.new(:A, 5),
-      CLTK::Token.new(:EOS)
+      CLTK::Token.new(:EOS),
     ]
 
     expected.should eq lexer.lex("aaa")
-
   end
 
   it "test_first_match" do
     expected = [
       CLTK::Token.new(:APLUS),
       CLTK::Token.new(:BPLUS),
-      CLTK::Token.new(:EOS)
+      CLTK::Token.new(:EOS),
     ]
 
     actual = ABFirst.lex("aaabbb")
@@ -136,7 +134,6 @@ describe "CLTK::Lexer" do
   end
 
   it "test_flags" do
-
     expect_raises(CLTK::Lexer::Exceptions::LexingError) do
       FlagLexer.lex("b")
     end
@@ -149,7 +146,7 @@ describe "CLTK::Lexer" do
       CLTK::Token.new(:A),
       CLTK::Token.new(:B),
       CLTK::Token.new(:C),
-      CLTK::Token.new(:EOS)
+      CLTK::Token.new(:EOS),
     ]
 
     actual = FlagLexer.lex("abc")
@@ -162,7 +159,7 @@ describe "CLTK::Lexer" do
       CLTK::Token.new(:A),
       CLTK::Token.new(:B),
       CLTK::Token.new(:C),
-      CLTK::Token.new(:EOS)
+      CLTK::Token.new(:EOS),
     ]
 
     actual = FlagLexer.lex("abcabc")
@@ -177,7 +174,7 @@ describe "CLTK::Lexer" do
   it "test_longest_match" do
     expected = [
       CLTK::Token.new(:APLUSBPLUS),
-      CLTK::Token.new(:EOS)
+      CLTK::Token.new(:EOS),
     ]
 
     actual = ABLongest.lex("aaabbb")
@@ -187,7 +184,7 @@ describe "CLTK::Lexer" do
 
   it "test_match_data" do
     expected = [CLTK::Token.new(:FOO, ", ccc"), CLTK::Token.new(:EOS)]
-    actual   = MatchDataLexer.lex("accc")
+    actual = MatchDataLexer.lex("accc")
 
     actual.should eq expected
   end
@@ -196,7 +193,7 @@ describe "CLTK::Lexer" do
     expected = [
       CLTK::Token.new(:A),
       CLTK::Token.new(:A),
-      CLTK::Token.new(:EOS)
+      CLTK::Token.new(:EOS),
     ]
 
     actual = StateLexer.lex("a (* bbb *) a")

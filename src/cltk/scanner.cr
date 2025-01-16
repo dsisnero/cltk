@@ -94,10 +94,13 @@ module CLTK
     # gets returned by the lexer
     #
     class Environment
-      @states    = [:default]
-      @tokens    = Array(Token).new
-      @positions = Array(StreamPosition).new
-      @offset    = 0
+      # Preallocate with reasonable sizes
+      def initialize(expected_token_count : Int32 = 256)
+        @states = [:default]
+        @tokens = Array(Token).new(expected_token_count)
+        @positions = Array(StreamPosition).new(expected_token_count)
+        @offset = 0
+      end
       # the lexed tokens
       getter :tokens
       # positions for lexed tokens
@@ -202,11 +205,14 @@ module CLTK
     # an instance of Environment
     def self.lex(string : String) : Environment
       finalize unless @@is_finalized
-      env = Environment.new
+      # Preallocate environment with estimated token count
+      estimated_tokens = (string.size / 8).to_i # Rough estimate of average token size
+      env = Environment.new(estimated_tokens)
       @@split_lines ?
         string.lines(false).each do |line|
           lex_string(line, env)
         end :
+      
         lex_string(string, env)
       env
     end
